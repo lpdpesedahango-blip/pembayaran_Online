@@ -91,7 +91,7 @@ button.pill{background:#eef3fd;border:1px solid #c8d7f5;color:#1d4fd7;border-rad
 @media print{body.pp #prt{display:block;width:100%;color:#000;font:12px/1.4 Arial,Helvetica,sans-serif}body.pp #wrap,body.pp aside{display:none!important}
 #prt h1{font-size:16px;text-align:center;margin:0 0 12px;color:#000}#prt p{margin:2px 0;color:#000}
 #prt table{width:100%;border-collapse:collapse;margin-top:8px}#prt th,#prt td{border:1px solid #000;padding:3px 6px;font-size:11.5px;color:#000;background:none}
-#prt th{background:#eee;text-align:center}#prt td.r,#prt th.r{text-align:right}#prt tfoot td{font-weight:700;background:#f2f2f2}
+#prt th{background:#eee;text-align:center}#prt td.r,#prt th.r{text-align:right}#prt tfoot{display:table-row-group}#prt tr{break-inside:avoid}#prt tfoot td{font-weight:700;background:#f2f2f2}
 .pf{margin-top:18px;text-align:right}.pf p{margin:2px 0}.pg1{break-after:page}.pg1:last-child{break-after:auto}}
 </style><style>
 .k5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:14px 0}
@@ -183,13 +183,13 @@ $('#bk').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjec
 $('#rs').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const a=JSON.parse(t),ks=new Set(loc.map(r=>r.k));a.forEach(r=>{if(r&&r.k&&r.d&&!ks.has(r.k))loc.push(r)});save();setg()}catch(x){alert('File tidak valid')}})};
 $('#ds').onclick=()=>{if(confirm('Hapus semua transaksi lokal di browser ini?')){loc=[];save();setg()}}}
 const BLN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','Nopember','Desember'],idl=d=>{const[y,m,x]=d.split('-');return +x+' '+BLN[m-1]+' '+y};
-function prn(){const R=flt(0,1).sort((a,b)=>a.o<b.o?-1:a.o>b.o?1:a.d<b.d?-1:a.d>b.d?1:a.k<b.k?-1:1),G={};R.forEach(r=>(G[r.o||'-']??=[]).push(r));
+function prn(){const R=flt(0,1).filter(r=>!isC(r)).sort((a,b)=>a.o<b.o?-1:a.o>b.o?1:a.d<b.d?-1:a.d>b.d?1:a.k<b.k?-1:1),G={};R.forEach(r=>(G[r.o||'-']??=[]).push(r));
 const w=new Date(Date.now()+8*36e5),z=x=>String(x).padStart(2,'0'),now=w.getUTCDate()+' '+BLN[w.getUTCMonth()]+' '+w.getUTCFullYear()+' '+z(w.getUTCHours())+':'+z(w.getUTCMinutes()),
 pr=(S.from?idl(S.from):'awal data')+' s/d '+(S.to?idl(S.to):'akhir data'),ft=`<div class="pf"><p>Dibuat pada : ${now} WITA</p><p>Admin : <b>${esc(CFG.op)}</b></p></div>`,ks=Object.keys(G),
 T1='<h1>LAPORAN TRANSAKSI PEMBAYARAN TAGIHAN</h1>';
-let h=ks.map(k=>{const g=G[k];return `<section class="pg1">${T1}<p>Tanggal Transaksi : ${pr}</p><p>Nama Kolektor : <b>${esc(k)}</b>${S.j?' · Jenis : '+esc(S.j):''}</p>${tbl(['No.','Tanggal','ID Pelanggan','Kode Transaksi','Jenis','Bayar','Ket.'],g.map((r,j)=>[j+1,dm(r.d),esc(r.id),esc(r.k),esc(r.j),fmt(r.b),esc(r.c)]),'lllllrl',`<tfoot><tr><td colspan="5">TOTAL ${fmt(g.length)} TRANSAKSI</td><td class="r">${fmt(sum(g,r=>r.b))}</td><td></td></tr></tfoot>`)}${ft}</section>`}).join('');
+let h=ks.map(k=>{const g=G[k];return `<section class="pg1">${T1}<p>Tanggal Transaksi : ${pr}</p><p>Nama Kolektor : <b>${esc(k)}</b>${S.j?' · Jenis : '+esc(S.j):''}</p>${tbl(['No.','ID Pelanggan','Nama Pelanggan','Kode Transaksi','Jenis Transaksi','Jml Bayar','Ket.'],g.map((r,j)=>[j+1,esc(r.id),esc(r.n),esc(r.k),esc(r.j),fmt(r.b),esc(r.c)]),'lllllrl',`<tfoot><tr><td colspan="5">TOTAL ${fmt(g.length)} TRANSAKSI</td><td class="r">${fmt(sum(g,r=>r.b))}</td><td></td></tr></tfoot>`)}${ft}</section>`}).join('');
 if(ks.length>1)h+=`<section class="pg1"><h1>REKAP TOTAL SEMUA KOLEKTOR</h1><p>Tanggal Transaksi : ${pr}</p>${tbl(['No.','Kolektor','Jumlah Transaksi','Total Bayar'],ks.map((k,i)=>[i+1,esc(k),fmt(G[k].length),fmt(sum(G[k],r=>r.b))]),'llrr',`<tfoot><tr><td colspan="2">TOTAL</td><td class="r">${fmt(R.length)}</td><td class="r">${fmt(sum(R,r=>r.b))}</td></tr></tfoot>`)}${ft}</section>`;
-if(!R.length)h=`<section>${T1}<p>Tidak ada transaksi pada filter ini.</p></section>`;
+if(!R.length)h=`<section>${T1}<p>Tidak ada transaksi non-cash pada filter ini.</p></section>`;
 $('#prt').innerHTML=h;document.body.classList.add('pp');print();document.body.classList.remove('pp')}
 const CKEY='tagihan_pelanggan_lokal_v1';let lc=[];try{lc=JSON.parse(localStorage.getItem(CKEY)||'[]')}catch(e){}
 lc.forEach(c=>cust.push(c));
