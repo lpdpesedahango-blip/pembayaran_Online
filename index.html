@@ -102,7 +102,7 @@ button.pill{background:#eef3fd;border:1px solid #c8d7f5;color:#1d4fd7;border-rad
 .sd details{margin:0 0 14px}.sd summary{cursor:pointer;font-weight:700;color:#1d5de8}.sd .fm{margin-top:12px}
 @media(max-width:1250px){.k5{grid-template-columns:repeat(2,1fr)}}
 </style><style>
-tr.dup td{background:#fdecec!important;color:#c62828;font-weight:600}tr.dup:hover td{background:#fbdcdc!important}
+tr.dup td{background:#fdecec!important;color:#c62828;font-weight:600}tr.dup:hover td{background:#fbdcdc!important}#prt tr.dup td{color:#c62828;font-weight:700}
 .wr2{background:#fdecec;color:#b3261e;border-radius:8px;padding:8px 12px;margin:0 0 10px;font-size:13.5px}
 </style></head><body>
 <aside></aside><div id="wrap"><main id="main"></main><footer><div class="fl"><span class="fp"><svg viewBox="0 0 24 24" class="ic"><path d="M9 4v16M9 4h10M9 11h7M3 8h3M2 14h4"/></svg>FastPay</span><span>| &nbsp;Transaksi Cepat, Mudah dan Aman</span></div><div class="fr"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><b>LPD Desa Adat Pesedahan</b> | Kecamatan Manggis, Kabupaten Karangasem</div></footer></div><div id="prt"></div>
@@ -197,7 +197,7 @@ T1='<h1>LAPORAN TRANSAKSI PEMBAYARAN TAGIHAN</h1>';
 let h=ks.map(k=>{const g=G[k];return `<section class="pg1">${T1}<p>Tanggal Transaksi : ${pr}</p><p>Nama Kolektor : <b>${esc(k)}</b>${S.j?' · Jenis : '+esc(S.j):''}</p>${tbl(['No.','ID Pelanggan','Nama Pelanggan','Kode Transaksi','Jenis Transaksi','Jml Bayar','Ket.'],g.map((r,j)=>[j+1,esc(r.id),esc(r.n),esc(r.k),esc(r.j),fmt(r.b),esc(r.c)]),'lllllrl',`<tfoot><tr><td colspan="5">TOTAL ${fmt(g.length)} TRANSAKSI</td><td class="r">${fmt(sum(g,r=>r.b))}</td><td></td></tr></tfoot>`)}${ft}</section>`}).join('');
 if(ks.length>1)h+=`<section class="pg1"><h1>REKAP TOTAL SEMUA KOLEKTOR</h1><p>Tanggal Transaksi : ${pr}</p>${tbl(['No.','Kolektor','Jumlah Transaksi','Total Bayar'],ks.map((k,i)=>[i+1,esc(k),fmt(G[k].length),fmt(sum(G[k],r=>r.b))]),'llrr',`<tfoot><tr><td colspan="2">TOTAL</td><td class="r">${fmt(R.length)}</td><td class="r">${fmt(sum(R,r=>r.b))}</td></tr></tfoot>`)}${ft}</section>`;
 if(!R.length)h=`<section>${T1}<p>Tidak ada transaksi non-cash pada filter ini.</p></section>`;
-$('#prt').innerHTML=h;document.body.classList.add('pp');print();document.body.classList.remove('pp')}
+$('#prt').innerHTML=h;document.querySelectorAll('#prt section').forEach((sc,si)=>{const g=G[ks[si]];if(!g)return;const c={},kf=x=>[x.d,x.id,x.b,x.u].join('|');g.forEach(x=>{if(x.id&&(x.b||x.u))c[kf(x)]=(c[kf(x)]||0)+1});sc.querySelectorAll('tbody tr').forEach((tr,j)=>{if(c[kf(g[j])]>1)tr.classList.add('dup')})});document.body.classList.add('pp');print();document.body.classList.remove('pp')}
 const CKEY='tagihan_pelanggan_lokal_v1';let lc=[];try{lc=JSON.parse(localStorage.getItem(CKEY)||'[]')}catch(e){}
 lc.forEach(c=>cust.push(c));
 const saveC=()=>{try{localStorage.setItem(CKEY,JSON.stringify(lc))}catch(e){}};
@@ -254,7 +254,7 @@ const f=$('#fm'),el=n=>f.elements[n],fee=()=>el('f').value=Math.max(0,el('b').va
 el('id').onblur=()=>{const i=el('id').value.trim(),c=cust.find(c=>String(c.id)===i)||(all().filter(r=>String(r.id)===i).pop());if(c){el('n').value=c.n;el('j').value=c.j;el('o').value=c.o}};
 el('t').oninput=()=>{if(!man)el('b').value=Math.ceil(el('t').value/CFG.k)*CFG.k;fee()};el('b').oninput=()=>{man=1;fee()};
 f.onsubmit=ev=>{ev.preventDefault();const g=n=>el(n).value,d=new Date(),p=x=>String(x).padStart(2,'0');
-loc.push({d:g('d'),id:g('id').trim(),n:g('n').trim().toUpperCase(),k:'TRX'+g('d').replace(/-/g,'')+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds()),j:g('j').trim(),t:+g('t'),b:+g('b'),f:+g('f'),u:+g('u'),c:g('c'),o:g('o').trim().toUpperCase()});save();inp();$('#ms').textContent='Transaksi tersimpan.'};
+loc.push({d:g('d'),id:g('id').trim(),n:g('n').trim().toUpperCase(),k:'TRX'+g('d').replace(/-/g,'')+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds()),j:g('j').trim(),t:+g('t'),b:+g('b'),f:+g('f'),u:+g('u'),c:g('c'),o:g('o').trim().toUpperCase()});save();if(S.to&&S.to<g('d'))S.to=g('d');inp();$('#ms').textContent='Transaksi tersimpan.'};
 $('#dl').onclick=()=>loc.length&&csv(loc,'transaksi-baru.csv');
 $('#tb').innerHTML=tbl(['Tanggal','ID','Nama','Jenis','Bayar','Ket.','Kolektor',''],loc.map((r,i)=>[dm(r.d),esc(r.id),esc(r.n),esc(r.j),fmt(r.b),esc(r.c),esc(r.o),`<button class=x data-i=${i}>Hapus</button>`]).reverse(),'lllrlll');
 document.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{if(confirm('Hapus transaksi ini?')){loc.splice(+b.dataset.i,1);save();inp()}})}
